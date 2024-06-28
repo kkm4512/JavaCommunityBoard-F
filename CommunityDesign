@@ -1,0 +1,40 @@
+[ Project : Community ]
+
+1. signIn, signUp, signOut
+    1-1. user 의 name,nickname 을 payload 로 받음
+        1-1-1. 중복 로그인 방지
+    1-2. jwt 로 만듬
+    1-3. 프론트로 쏴줌
+    1-4. 프론트 쿠키로 저장
+        1-4-1. 쿠키값 셋팅해보기 (maxAge 등등)
+    1-5. signOut 버튼 누르면 쿠키값 날려버리기
+    1-6. signUp 할때 비밀번호 해싱처리해서 저장하기
+
+
+2. board CRUD
+    2-1. 기본적인 board 의 CRUD 구현
+        2-1-1. saveBoard
+            2-1-1-1. 제목,본문,닉네임 모두 중복 될 수 있음
+            2-1-1-2. DTO,Entity 도매인 객체 생성시 데이터의 무결성만 확인 //유효한 데이터 타입인지
+        2-1-2. getBoardById
+            2-1-2-1. boardId 로 board 뽑아주기
+        2-1-3. updateBoard
+            2-1-3-1. boardId 로 찾고, update 해주기
+        2-1-4. removeBoard
+            2-1-4-1. boardId 로 찾고, remove
+        2-1-5. getAllBoards
+            2-1-5-1. 전체 board 반환
+    2-2. boardDTO
+        2-2-1. title,description,writer
+        2-2-2. 후에 좋아요,공유,댓글달기 기능 구현예정
+    2-3. boardEntity
+        2-3-1. title,description,writer
+        2-3-2. 후에 좋아요,공유,댓글달기 기능 구현예정
+
+[ Todo Next Project ]
+
+1. MySQL docker compose 로 연결하기
+2. 이미지 여러개 담기게 할 수 있게 하기
+3. JWTFilter 에서 내가 정한 경로외에는 요청 못하게 막기
+4. JWTFilter 에서 발생하는 오류 프론트로 던져줄떄, 동일한 형식으로 던질수 있게 하기
+

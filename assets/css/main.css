@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-background text-white; /* Tailwind CSS 클래스를 사용하여 배경색과 텍스트 색상 설정 */
+}
+
+.container {
+  max-width: 1080px; /* 최대 너비 설정 */
+  margin: 0 auto; /* 중앙 정렬 */
+  padding: 0 20px; /* 양쪽 여백 */
+}
