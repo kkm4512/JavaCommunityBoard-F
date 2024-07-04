@@ -43,13 +43,13 @@
             <div id="dropdownNavbar" class="z-10 font-normal bg-slate-400 divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600" v-if="isOpen">
               <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
                 <li>
-                  <nuxt-link to="/dashboard" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</nuxt-link>
+                  <nuxt-link to="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</nuxt-link>
                 </li>
                 <li>
-                  <nuxt-link to="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</nuxt-link>
+                  <nuxt-link to="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</nuxt-link>
                 </li>
                 <li>
-                  <nuxt-link to="/earnings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</nuxt-link>
+                  <nuxt-link to="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</nuxt-link>
                 </li>
               </ul>
               <div class="py-1" v-if="isValidateAccessToken === true">
@@ -67,21 +67,21 @@
           </li>
           <li>
             <nuxt-link
-              to="/services"
+              to="/"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >Services</nuxt-link
             >
           </li>
           <li>
             <nuxt-link
-              to="/pricing"
+              to="/"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >Pricing</nuxt-link
             >
           </li>
           <li v-if="proFilePahts.profileImgPath">
             <nuxt-link
-              to="/contact"
+              :to="`/myPage/${loginMemberId}/1/${getBoardsMaxPage+getShareBoardsMaxPage}`"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
             >
               <div class="w-10 h-10 rounded-full overflow-hidden border border-black">
@@ -96,19 +96,40 @@
 </template>
 
 <script setup lang="ts">
+//내가 몇번쨰 페이지를 클릭했는지를 header에서 어캐알게하지?
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { DEFAULT_PROFILE_PATH } from "~/paths/pathConstatns";
+import type { ResponseBoard } from "~/types/boards";
 
 const isValidateAccessToken = ref<boolean>(false);
+const loginMemberId = ref<number | null>(null);
+
 
 const useValidateAccessToken = useValidateAccessTokenStore();
 const useAccessToken = useAccessTokenStore();
 const useMemberProfileImage = useMemberProfileImageStore();
 
+
+
 const isOpen = ref<boolean>(false);
 const navRef = ref<HTMLElement | null>(null);
+const getBoardsMaxPage = ref<number>(0);
+const getShareBoardsMaxPage = ref<number>(0);
 
+//myPage인 사람의 게시글이 총 몇개인지 가져와야함
+//share 합쳐서
+onMounted( async() => {
+  useValidateAccessToken.validateAccessToken = await isVerifyAccessTokenFetch();
+  const getBoards = await boardGetAllFetch<ResponseBoard[]>(`/getBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
+  if (getBoards) {
+    getBoardsMaxPage.value = getBoards.length;
+  }
+  const getShareBoards = await boardGetAllById<ResponseBoard[]>(`/getShareBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
+  if (getShareBoards) {
+    getShareBoardsMaxPage.value = getShareBoards.length;
+  }  
 
+})
 //프로필 이미지 경로들
 const proFilePahts = ref<{profileImgPath:string,memberProfilePath:string,defaultProfilePath:string}>({
   //회원가입할떄 이미지 안넣었으면, 디폴트 이미지로 변경시키기 위한 변수
@@ -127,6 +148,7 @@ watchEffect(() => {
 
   //로그인여부로 결정할까?
   if ( useAccessToken.accessToken ) {
+    loginMemberId.value = JwtDecode(useAccessToken.accessToken).id;
     proFilePahts.value.profileImgPath = proFilePahts.value.memberProfilePath ? proFilePahts.value.memberProfilePath : proFilePahts.value.defaultProfilePath;
   }  
 });

@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import { DEFAULT_PROFILE_PATH } from '~/paths/pathConstatns';
+
 const userInfo = ref({
   name: "",
   password: "",
@@ -49,6 +51,7 @@ async function signIn() {
     //img 받아올 api요청
     const getMemberProfileImageURL = await memberGetProfileFetch<string>(`/getProfileImg/${memberId}`, "GET");
     if (getMemberProfileImageURL) useMemberProfileImage.updateMemberProfileImage(getMemberProfileImageURL);
+    else useMemberProfileImage.updateMemberProfileImage(DEFAULT_PROFILE_PATH);
     
     alert("로그인 성공");
     navigateTo("/");

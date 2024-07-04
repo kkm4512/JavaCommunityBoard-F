@@ -1,5 +1,7 @@
 [ Project : Community ]
 
+[ JavaSpring ]
+
 1. signIn, signUp, signOut
     1-1. user 의 name,nickname 을 payload 로 받음
         1-1-1. 중복 로그인 방지
@@ -30,11 +32,55 @@
     2-3. boardEntity
         2-3-1. title,description,writer
         2-3-2. 후에 좋아요,공유,댓글달기 기능 구현예정
+    
+        
+
+[ Nuxt3 ]
+
+1. pageNavigation 구현 예정
+    1-1. 총 5페이지 씩 보이게 할예정
+    2-1. 1페이지씩 5개의 게시물이 보이게할 예정
+    3-1. 페이지 계산
+        3-1-1. 일단 디폴트로 1페이지 세팅
+        3-1-2. 게시물이 하나도 없다면 1페이지만
+        3-1-3. 게시물이 14개 있다면 3페이지 까지
+        3-1-4. 게시물이 16개 있다면 4페이지 까지
+    4-1. indexPage에서 현재 desc방식으로 board들을 받아오고있음
+        4-1-1. 사용자가 2페이지 클릭했을시
+            4-1-1-1. 내 db에 6 ~ 10번쨰에 해당하는 게시글들을 가져와야함
+        4-1-2. 1페이지 클릭했다면
+            4-1-1-2. 내 db에 1 ~ 5번째에 해당하는 게시글들을 가져와야함
+        4-1-3. 그렇다면 indexPage에서 데이터는 이제 맨 처음 사용자가 입장했을떄는 아무것도 하지않았으니 그때만 딱 1페이지 데이터 5개 받는걸로하고
+        4-1-4. 그 이후 부터는 사용자가 누르는 페이지에 따라 데이터를 주는걸로 하자
+
+2. comment
+    2-1. (게시글의 작성자 === 댓글 작성자)
+        2-1.1 자신의 댓글은 삭제,업뎃 가능하고 다른 사람의 댓글에 대해서 삭제 가능
+    2-2. (게시글의 작성자 !== 댓글 작성자) && (댓글 작성자와 === 로그인 아이디)
+        2-1-2. 자신의 댓글에 대해서만 삭제 업뎃 가능
+
+3. share
+    3-1. 현재 board에 담겨져있는 정보 전부를 자신의 페이지로 옮기기
+    3-2. 뭔가 공유됐다는 표시해주면 좋을듯
+
+
 
 [ Todo Next Project ]
 
-1. MySQL docker compose 로 연결하기
-2. 이미지 여러개 담기게 할 수 있게 하기
-3. JWTFilter 에서 내가 정한 경로외에는 요청 못하게 막기
-4. JWTFilter 에서 발생하는 오류 프론트로 던져줄떄, 동일한 형식으로 던질수 있게 하기
+1. MySQL docker compose 로 연결하기 [ JavaSpring ]
+2. 이미지 여러개 담기게 할 수 있게 하기 [ JavaSpring ] , [ Nuxt3 ]
+3. JWTFilter 에서 내가 정한 경로외에는 요청 못하게 막기 [ JavaSpring ]
+4. JWTFilter 에서 발생하는 오류 프론트로 던져줄떄, 동일한 형식으로 던질수 있게 하기 [ JavaSpring ]
+5. mdi icons 한 곳에 모아서 처리하기 [ Nuxt3 ]
+6. join 빡세게 보기 [ JavaSpring ]
+7. 반환시킬떄 DTO 로 반환해서 주기 [ JavaSpring ]
+    7-1. 뭔가 join 하고나서 entity 로 반환시켜주다보니 eager True 무작정 주는게 맘에걸림
+    7-2. lazy loading 때문에 쓰고있긴한데 성능문제 있을수있음
+8. JSON 직렬화 [ JavaSpring ]
+9. 버튼 클릭할때 로그인 여부 확인하게 하기 ( 전역적으로 ) [ Nuxt3 ]
+10. db 생성시 join 잘되게 너무 많이 넣지말고 분산시켜서 만들기 [ JavaSpring ]
+11. 다음 db에 회원가입시 이미지 안넣었으면 default 이미지넣어두고, default 경로 만들어두기 [ JavaSpring ]
+12. onMounted 쓰지말고 asyncData 쓰기 [ Nuxt3 ]
+13. 양방향 연관 관계 설정 [ JavaSpring ]
+
 
