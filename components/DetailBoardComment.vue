@@ -1,8 +1,21 @@
 <template>
   <label for="chat" class="sr-only">Your message</label>
-  <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700"></div>
-  <div v-for="(commentData, i) of commentFormatCreatedDataList" :key="i">
-    <div class="flex justify-center border-2 items-center text-sm mt-2">
+  <div class="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
+    <textarea
+      v-model="description"
+      id="chat"
+      rows="1"
+      class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      placeholder="Your message..."
+    ></textarea>
+    <button type="submit" @click="commentSendClicked" class="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600">
+      <svg class="w-5 h-5 rotate-90 rtl:-rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+        <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
+      </svg>
+    </button>
+  </div>
+  <div v-for="(commentData, i) of commentDatasSendCommentModal.commentDatas" :key="i">
+    <div class="flex border items-center text-sm mt-2 justify-center">
       <div class="max-w-10 max-h-10 rounded-full overflow-hidden border border-black">
         <img :src="profilePaths[i]" />
       </div>
@@ -12,7 +25,7 @@
       <div
         id="message"
         rows="4"
-        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ml-5"
+        class="block p-2.5 w-1/2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ml-5"
       >
         {{ commentData.comment }}
       </div>
@@ -30,11 +43,13 @@
         </div>
       </div>
     </div>
-    <div v-if="updateClicked" class="text-black">
-      <CommentUpdateModal :commentUpdateModal="commentUpdateModal" @comment-update="handleCommentUpdateClicked" />
-    </div>
-    <div v-if="removeClicked" class="text-black">
-      <CommentRemoveModal :commentRemoveModal="commentRemoveModal" @comment-remove="handleCommentRemoveClicked" />
+    <div class="flex justify-end">
+      <div v-if="updateClicked" class="text-black">
+        <CommentUpdateModal :commentUpdateModal="commentUpdateModal" @comment-update="handleCommentUpdateClicked" />
+      </div>
+      <div v-if="removeClicked" class="text-black">
+        <CommentRemoveModal :commentRemoveModal="commentRemoveModal" @comment-remove="handleCommentRemoveClicked" />
+      </div>
     </div>
   </div>
 </template>
@@ -89,26 +104,6 @@ const commentRemoveModal = reactive<CommentRemoveModal>({
   boardId: -1,
   memberId: -1,
 });
-
-//댓글 작성일 순서대로 정리한 데이터
-const commentFormatCreatedDates: CommentsDatas[] = props.commentDatasSendCommentModal.commentDatas.sort((a, b) => {
-  return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-});
-const commentFormatCreatedDataList: CommentsDatas[] = [];
-if (commentFormatCreatedDates.length >= 5) {
-  for (let i = 0; i < 5; i++) {
-    commentFormatCreatedDataList.push(commentFormatCreatedDates[i]);
-  }
-} else {
-  for (let i = 0; i < commentFormatCreatedDates.length; i++) {
-    commentFormatCreatedDataList.push(commentFormatCreatedDates[i]);
-  }  
-}
-
-
-// for ( const comment of props.commentDatasSendCommentModal.commentDatas) {
-
-// }
 
 onMounted(async () => {
   for (const commentData of props.commentDatasSendCommentModal.commentDatas) {

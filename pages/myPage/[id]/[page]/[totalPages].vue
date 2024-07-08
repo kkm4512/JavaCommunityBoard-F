@@ -1,9 +1,12 @@
 <template>
   <div class="flex justify-center items-center" v-for="board in boards" :key="board.boardId">
-    <Board :board="board" @remove-board="handleRemoveBoard" @comment-board-index-update="handleCommentUpdate" @comment-board-index-remove="handleCommentRemove" @comment-board-index-send="handleCommentSend"/>
-  </div>
-  <div class="flex justify-center items-center" v-for="shareBoard in shareBoards" :key="shareBoard.id">
-    <ShareBoard :shareBoard="shareBoard" @share-remove-board="handleShareRemoveBoard"/>
+    <Board :board="board" 
+    @remove-board="handleRemoveBoard" 
+    @comment-board-index-update="handleCommentUpdate" 
+    @comment-board-index-remove="handleCommentRemove" 
+    @comment-board-index-send="handleCommentSend"
+    @share-removeBoard="handleShareRemoveBoard"
+    />
   </div>  
   <div class="flex justify-center mb-[5%]">
     <PageNavigateMyPage :pageNavigateMyPageData="pageNavigateMyPageData" />
@@ -16,39 +19,36 @@ import type { CommentRemoveModal, CommentUpdateModal, CommentsDatas } from '~/ty
 
 
 const boards = ref<ResponseBoard[]>([]);
-const shareBoards = ref<ResponseShareBoard[]>([]);
 const useAccessToken = useAccessTokenStore()
 const route = useRoute();
 const memberId = route.params.id as string;
-const pageNavigateMyPageData = {
+const pageNumber = route.params.page as string;
+const pageNavigateMyPageData = reactive({
   totalBoards: parseInt(route.params.totalPages as string),
   memberId: memberId,
-}
+  curPage: parseInt(route.params.page as string),
+});
 
 onMounted(async () => {
   const loginMyId = JwtDecode(useAccessToken.accessToken).id;
-  const responses = await boardGetAllFetch<ResponseBoard[]>(`/getBoards/${loginMyId}`);
-  if (responses) {
-    for (const response of responses) {
-      boards.value.push(response);
+  const getAllBoards = await allBoardGetSizeByPageAndLoginMemberId<ResponseBoard[]>(pageNumber,loginMyId);
+    if (getAllBoards) {
+    for ( const board of getAllBoards ) {
+      boards.value.push(board)
     }
-  }
-  const getShareBoards = await boardGetAllById<ResponseShareBoard[]>(`getShareBoards/${loginMyId}`);
-  if (getShareBoards) {
-    for ( const getShareBoard of getShareBoards ) {
-      shareBoards.value.push(getShareBoard)
-    }
-  }
+  }  
 });
 
 //자식 컴포넌트에서 remove하여 데이터를 삭제하고 boardId값을 받아옴
 //해당 boardId값으로 필터를 통해 boards를 초기화 시키고 다시줌
 function handleRemoveBoard(boardId: number) {
   boards.value = boards.value.filter((board) => board.boardId !== boardId);
+  pageNavigateMyPageData.totalBoards--;
 }
 
 function handleShareRemoveBoard(shareBoard: ResponseShareBoard) {
-  shareBoards.value = shareBoards.value.filter((board) => board.boardId !== shareBoard.boardId);
+  boards.value = boards.value.filter( board => board.sharedId !== shareBoard.sharedId );
+  pageNavigateMyPageData.totalBoards--;
 }
 
 
@@ -76,6 +76,11 @@ function handleCommentSend(commentsDatas:CommentsDatas){
   const boardIdx = boards.value.findIndex(board => board.boardId === getBoardId);  
   boards.value[boardIdx].comments.push(commentsDatas);
 }
+
+const pageNavigateMyPageDataComputed = computed(() => ({
+  ...pageNavigateMyPageData,
+  totalBoards: pageNavigateMyPageData.totalBoards,
+}));
 
 </script>
 

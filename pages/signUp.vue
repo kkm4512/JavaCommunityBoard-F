@@ -42,6 +42,14 @@
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         />
       </div>
+      <div class="mb-6 w-1/2" v-if="selectedIcon === 'ROLE_ADMIN'">
+        <label for="Admin_Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin_Password</label>
+        <input
+          v-model="adminPasswordCheck"
+          type="text"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        />
+      </div>
 
       <div class="flex items-center justify-center w-full mb-5">
         <label
@@ -61,7 +69,7 @@
               </svg>
             </div>
             <div v-else class="max-w-[60%] max-h-[50%]">
-              <img :src="imageUrl">
+              <img :src="imageUrl" />
             </div>
             <p class="text-gray-500 dark:text-gray-400 font-semibold text-lg"><span>Your Profile Img</span></p>
             <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
@@ -95,6 +103,8 @@ const midIconPaths = ref({
   user: mdiAccount,
 });
 
+const adminPasswordCheck = ref<string>("");
+const adminPasswordKey = "대한민국";
 const userInfo = reactive({
   name: "",
   password: "",
@@ -103,23 +113,35 @@ const userInfo = reactive({
 });
 
 async function signUp() {
-  const formData = new FormData();
-  formData.append(
-    "userInfo",
-    new Blob([JSON.stringify({
-      name: userInfo.name,
-      password: userInfo.password,
-      nickname: userInfo.nickname,
-      role: userInfo.role,
-    })], { type: "application/json" })
-  );
-  if (file.value) {
-    formData.append("profileImg", file.value);
-  }
-  const res = await memberFetch("signUp", "POST", formData);
-  if (res) {
-    alert("회원가입 성공");
-    navigateTo("/");
+  if (selectedIcon.value === "ROLE_ADMIN") {
+    if (adminPasswordCheck.value !== adminPasswordKey) {
+      alert("관리자 패스워드가 일치하지 않습니다");
+      return;
+    }
+  } else {
+    const formData = new FormData();
+    formData.append(
+      "userInfo",
+      new Blob(
+        [
+          JSON.stringify({
+            name: userInfo.name,
+            password: userInfo.password,
+            nickname: userInfo.nickname,
+            role: userInfo.role,
+          }),
+        ],
+        { type: "application/json" }
+      )
+    );
+    if (file.value) {
+      formData.append("profileImg", file.value);
+    }
+    const res = await memberFetch("signUp", "POST", formData);
+    if (res) {
+      alert("회원가입 성공");
+      navigateTo("/");
+    }
   }
 }
 

@@ -59,6 +59,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 
 const { file, handleFileUpload } = useFileUpload();
 
+
 const board = reactive({
   memberId: memberId,
   title: "",

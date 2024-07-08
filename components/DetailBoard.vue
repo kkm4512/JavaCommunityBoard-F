@@ -1,22 +1,19 @@
 <template>
   <!-- if -->
-  <div v-if="updateModalOpen" class="text-black">
-    <BoardUpdateModal :updateModal="updateModal" @modalClicked="handleUpdateModalClicked" />
-  </div>
-  <div v-if="removeModalOpen" class="text-black">
-    <BoardRemoveModal :removeModalOpen="removeModalOpen" @modalClicked="handleRemoveModalClicked" />
-  </div>
-  <div v-if="isShare === mdiIcons.share">
-    <ShareModal :shareBoard="shareBoard" @-share-modal="handleShare" />
-  </div>
   <div
-    class="flex-col justify-center items-center w-1/2 p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mt-5 mb-5 cursor-pointer"
-    @click.stop="goToDetailBoard"
+    class="flex-col justify-center items-center w-full h-full p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mt-5 mb-5 cursor-pointer"
+    @click="goToDetailBoard"
     v-if="!board.shared"
   >
+    <div v-if="updateModalOpen" class="text-black">
+      <BoardUpdateModal :updateModal="updateModal" @modalClicked="handleUpdateModalClicked" />
+    </div>
+    <div v-if="removeModalOpen" class="text-black">
+      <BoardRemoveModal :removeModalOpen="removeModalOpen" @modalClicked="handleRemoveModalClicked" />
+    </div>
     <div class="flex justify-between mb-5" v-if="showUpdateRemoveButton">
-      <svg-icon @click.stop="handleUpdate" type="mdi" :path="mdiIcons.update" class="text-black cursor-pointer"></svg-icon>
-      <svg-icon @click.stop="handleRemove" type="mdi" :path="mdiIcons.close" class="text-black cursor-pointer"></svg-icon>
+      <svg-icon @click="handleUpdate" type="mdi" :path="mdiIcons.update" class="text-black cursor-pointer"></svg-icon>
+      <svg-icon @click="handleRemove" type="mdi" :path="mdiIcons.close" class="text-black cursor-pointer"></svg-icon>
     </div>
 
     <div class="text-black flex mb-2 w-1/2 rounded-xlh-10 items-center">
@@ -34,14 +31,16 @@
     </div>
     <p class="flex justify-center font-normal text-gray-700 dark:text-gray-400 mb-5 mt-5">{{ board.description }}</p>
     <div class="flex justify-between text-black cursor-pointer">
-      <svg-icon type="mdi" :path="isLike" @click.stop="likeClicked"></svg-icon>
-      <svg-icon type="mdi" :path="isComment" @click.stop="commnetClicked"></svg-icon>
-      <svg-icon type="mdi" :path="isShare" @click.stop="shareClicked"></svg-icon>
+      <svg-icon type="mdi" :path="isLike" @click="likeClicked"></svg-icon>
+      <svg-icon type="mdi" :path="isComment" @click="commnetClicked"></svg-icon>
+      <svg-icon type="mdi" :path="isShare" @click="shareClicked"></svg-icon>
     </div>
     <div v-if="isComment === mdiIcons.comment" class="text-black mt-5">
-      <Comment :commentDatasSendCommentModal="commentDatas" @comment-board-send.stop="handleComment" @comment-board-update.stop="handleCommentUpdate" @comment-board-remove.stop="handleCommentRemove" />
+      <DetailBoardComment :commentDatasSendCommentModal="commentDatas" @comment-board-send="handleComment" @comment-board-update="handleCommentUpdate" @comment-board-remove="handleCommentRemove" />
     </div>
-
+    <div v-if="isShare === mdiIcons.share">
+      <ShareModal :shareBoard="shareBoard" @-share-modal="handleShare" />
+    </div>
     <div class="flex justify-between mt-5 text-sm">
       <div class="text-black">{{ formatDate(props.board.createdAt) }}</div>
       <div class="text-black">{{ formatDate(props.board.updatedAt) }}</div>
@@ -50,8 +49,7 @@
 
   <!-- else -->
   <div
-    class="flex-col justify-center items-center w-1/2 p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mt-5 mb-5"
-    v-else
+    class="flex-col justify-center items-center w-1/2 p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mt-5 mb-5" v-else
   >
     <div class="bg-gray-300 rounded-xl p-3">
       <div class="flex justify-end mb-5" @click="handleShareRemove">
@@ -282,7 +280,7 @@ function handleShareRemove() {
 const removeModalOpen = ref<boolean>(false);
 
 //remove 버튼 눌렸을떄 부모컴포넌트에서 즉시 데이터 삭제를 하기위함
-const emit = defineEmits(["removeBoard", "comment-board-index-update", "comment-board-index-remove", "comment-board-index-send", "share-removeBoard"]);
+const emit = defineEmits(["removeBoard", "comment-board-index-update", "comment-board-index-remove", "comment-board-index-send","share-removeBoard"]);
 
 //coomnet 댓글 emit받은것
 async function handleComment(comment: string) {
@@ -323,7 +321,7 @@ async function handleShareRemoveModalClicked(option?: string) {
     boardId: props.board.boardId,
     loginMemberId: loginMyId.value,
     sharedId: props.board.sharedId,
-  };
+  }
   if (option) {
     const res = await boardFetch<boolean>("/share/removeBoard", "DELETE", data);
     if (res) emit("share-removeBoard", props.board);
@@ -382,8 +380,8 @@ async function handleShare(board: ResponseBoard) {
 }
 
 //상세보기 게시판 가기
-function goToDetailBoard() {
-  router.push(`/board/${props.board.boardId}/detailBoard`);
+function goToDetailBoard(){
+  router.push(`/board/${props.board.boardId}/detailBoard`)
 }
 </script>
 

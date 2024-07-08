@@ -6,12 +6,14 @@ export interface ResponseBoard {
   nickname: string;
   createdAt: string;
   updatedAt: string;
-  boardImagePath?: string;
-  writerImagePath: string;
+  boardImagePath: string;
   id: number;
 
   likes: Likes[];
   comments: Comments[];
+
+  shared?: boolean;
+  sharedId: number;
 }
 
 interface Comments {
@@ -19,6 +21,8 @@ interface Comments {
   boardId: number,
   memberId: number,
   comment: string,  
+  createdAt: string,
+  updatedAt: string,
 }
 
 interface Likes {
@@ -52,8 +56,13 @@ export interface ResponseShareBoard {
   description: string;
   nickname: string;
   createdAt: string;
+  updatedAt: string;
   boardImagePath: string;
-  writerImagePath: string;
-  id: number;  
-  isShared: boolean;
+  id: number;
+
+  likes: Likes[];
+  comments: Comments[];
+
+  shared: boolean;
+  sharedId: number;
 }

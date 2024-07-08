@@ -3,6 +3,8 @@ export interface CommentsDatas {
   memberId: number;
   boardId: number;
   comment: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CommentUpdateModal {

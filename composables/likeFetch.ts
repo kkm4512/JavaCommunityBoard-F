@@ -3,7 +3,7 @@ import type { Error } from "~/types/errorResponse";
 export async function likeFetch(memberId:string | number,boardId:string | number): Promise<void> {
   const token = await getCookie();
   try {
-    const response: boolean = await $fetch(`http://localhost:8080/like/${memberId}/${boardId}`, {
+    const response: boolean = await $fetch(`http://localhost:8081/like/${memberId}/${boardId}`, {
       method: "GET",
       headers: {
         Authorization: "Bearer " + token,

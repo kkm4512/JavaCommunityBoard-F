@@ -9,26 +9,32 @@
     />
   </div>
   <div class="flex justify-center mb-[5%]">
-    <PageNavigate :totalBoards="maxPageNumber" />
+    <PageNavigate :datas="datas" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ResponseBoard } from "~/types/boards";
 import type { CommentRemoveModal, CommentUpdateModal, CommentsDatas } from "~/types/commentUpdateModal";
-import Board from '~/components/Board.vue'
+import Board from "~/components/Board.vue";
 
 const route = useRoute();
 const useValidateAccessToken = useValidateAccessTokenStore();
-const pageNumber = route.params.id as string;
+const pageNumber = route.params.page as string;
 const totalPages = route.params.totalPages as string;
-const maxPageNumber = parseInt(totalPages)
+const maxPageNumber = parseInt(totalPages);
+const datas = reactive({
+  totalPages: maxPageNumber,
+  curPage: parseInt(route.params.page as string),
+});
+
 const boards = ref<ResponseBoard[]>([]);
 
 //자식 컴포넌트에서 remove하여 데이터를 삭제하고 boardId값을 받아옴
 //해당 boardId값으로 필터를 통해 boards를 초기화 시키고 다시줌
 function handleRemoveBoard(boardId: number) {
   boards.value = boards.value.filter((board) => board.boardId !== boardId);
+  datas.totalPages--;
 }
 
 //comment가 수정되었을떄
@@ -55,17 +61,18 @@ function handleCommentSend(commentsDatas: CommentsDatas) {
   boards.value[boardIdx].comments.push(commentsDatas);
 }
 
-
-onMounted( async() => {
+onMounted(async () => {
   useValidateAccessToken.validateAccessToken = await isVerifyAccessTokenFetch();
   const getBoards = await boardGetSizeByPage<ResponseBoard[]>(pageNumber);
   if (getBoards) {
-    boards.value = [...getBoards]
+    boards.value = [...getBoards];
   }
-  console.log(getBoards);
-})
+});
+
+const datasComputed = computed(() => ({
+  ...datas,
+  totalPages: datas.totalPages,
+}));
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

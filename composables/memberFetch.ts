@@ -4,7 +4,7 @@ import type { Error } from "~/types/errorResponse";
 export async function memberFetch<T>(url: string, methods?: HttpMethod, data?: {}): Promise<T | undefined> {
   try {
     const response: T = await $fetch(url, {
-      baseURL: `http://localhost:8080/`,
+      baseURL: `http://localhost:8081/`,
       method: methods,
       body: data,
     });
@@ -25,7 +25,7 @@ export async function memberFetch<T>(url: string, methods?: HttpMethod, data?: {
 export async function memberGetProfileFetch<T>(url: string, methods?: HttpMethod, data?: {}): Promise<T | undefined> {
   try {
     const response: T = await $fetch(url, {
-      baseURL: `http://localhost:8080/`,
+      baseURL: `http://localhost:8081/`,
       method: methods,
       body: data,
     });

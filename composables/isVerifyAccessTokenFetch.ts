@@ -3,7 +3,7 @@ import type { Error } from "~/types/errorResponse";
 export async function isVerifyAccessTokenFetch(): Promise<boolean> {
   try {
     const token = await getCookie();
-    const response: boolean = await $fetch(`http://localhost:8080/accessToken/verify`, {
+    const response: boolean = await $fetch(`http://localhost:8081/accessToken/verify`, {
       method: "GET",
       headers: {
         Authorization: "Bearer " + token,
