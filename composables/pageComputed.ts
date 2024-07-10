@@ -1,6 +1,6 @@
-export function pageComputed(curPage:Ref<number>,totalPages:Ref<number>){
+export function pageComputed(curPage:Ref<number>,totalPages:Ref<number>,maxPageNumber:number = 5): { disPlayedPages: ComputedRef<number[]> }{
   const disPlayedPages = computed(()=>{
-    const maxPage = 5;
+    const maxPage = maxPageNumber;
     const half = Math.floor(maxPage/2);
     let start = Math.max(curPage.value - half,1)
     let end = Math.min(start + maxPage - 1,totalPages.value)

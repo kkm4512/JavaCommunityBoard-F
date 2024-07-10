@@ -4,7 +4,7 @@
       <nuxt-link to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
         <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">CommunityBoard</span>
       </nuxt-link>
-    
+
       <button
         data-collapse-toggle="navbar-dropdown"
         type="button"
@@ -21,22 +21,22 @@
         <ul
           class="flex items-center font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-slate-400 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700"
         >
-        <li v-if="role === 'ROLE_ADMIN'">
+          <li v-if="role === 'ROLE_ADMIN'">
             <nuxt-link
               to="/inquiry/1/getInquiry"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               aria-current="page"
-              >getInquiry</nuxt-link
+              >GetInquiry</nuxt-link
             >
-          </li>        
-          <li v-else>
+          </li>
+          <li v-else-if="role === 'ROLE_USER'">
             <nuxt-link
-              to="/inquiry/email"
+              :to="`/inquiry/1/${loginMemberId}/email`"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               aria-current="page"
               >Email</nuxt-link
             >
-          </li>          
+          </li>
           <li>
             <nuxt-link
               to="/board/addBoard"
@@ -49,10 +49,10 @@
             <nuxt-link
               to="https://github.com/kkm4512/JavaCommunityBoard-F"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >GihHub</nuxt-link
+              >Github</nuxt-link
             >
           </li>
-          <li>
+          <li v-if="role === 'ROLE_USER'">
             <nuxt-link
               to="/Inquiry"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
@@ -83,7 +83,7 @@
           </div>
           <li v-if="proFilePahts.profileImgPath">
             <nuxt-link
-              :to="`/myPage/${loginMemberId}/1/${getBoardsMaxPage + getShareBoardsMaxPage}`"
+              :to="`/myPage/${loginMemberId}/1`"
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
             >
               <div class="w-10 h-10 rounded-full overflow-hidden border border-black">
@@ -101,10 +101,11 @@
 //내가 몇번쨰 페이지를 클릭했는지를 header에서 어캐알게하지?
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { DEFAULT_PROFILE_PATH } from "~/paths/pathConstatns";
-import type { ResponseBoard } from "~/types/boards";
 
 const isValidateAccessToken = ref<boolean>(false);
 const loginMemberId = ref<number | null>(null);
+
+
 
 const useValidateAccessToken = useValidateAccessTokenStore();
 const useAccessToken = useAccessTokenStore();
@@ -113,22 +114,7 @@ const useMemberProfileImage = useMemberProfileImageStore();
 const isOpen = ref<boolean>(false);
 const navRef = ref<HTMLElement | null>(null);
 const role = ref<string | null>("");
-const getBoardsMaxPage = ref<number>(0);
-const getShareBoardsMaxPage = ref<number>(0);
 
-//myPage인 사람의 게시글이 총 몇개인지 가져와야함
-//share 합쳐서
-onMounted(async () => {
-  useValidateAccessToken.validateAccessToken = await isVerifyAccessTokenFetch();
-  const getBoards = await boardGetAllById<ResponseBoard[]>(`/getBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
-  if (getBoards) {
-    getBoardsMaxPage.value = getBoards.length;
-  }
-  const getShareBoards = await boardGetAllById<ResponseBoard[]>(`/getShareBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
-  if (getShareBoards) {
-    getShareBoardsMaxPage.value = getShareBoards.length;
-  }
-});
 //프로필 이미지 경로들
 const proFilePahts = ref<{ profileImgPath: string; memberProfilePath: string; defaultProfilePath: string }>({
   //회원가입할떄 이미지 안넣었으면, 디폴트 이미지로 변경시키기 위한 변수

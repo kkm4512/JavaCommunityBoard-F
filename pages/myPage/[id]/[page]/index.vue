@@ -6,35 +6,60 @@
       @comment-board-index-update="handleCommentUpdate"
       @comment-board-index-remove="handleCommentRemove"
       @comment-board-index-send="handleCommentSend"
+      @share-removeBoard="handleShareRemoveBoard"
     />
   </div>
-  <div class="flex justify-center mt-5">
-    <PageNavigate :datas="datas" />
+  <div class="flex justify-center mb-[5%]">
+    <PageNavigateMyPage :pageNavigateMyPageData="pageNavigateMyPageData" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ResponseBoard } from "~/types/boards";
+import type { ResponseBoard, ResponseShareBoard } from "~/types/boards";
 import type { CommentRemoveModal, CommentUpdateModal, CommentsDatas } from "~/types/commentUpdateModal";
-import Board from "~/components/Board.vue";
 
+const getBoardsMaxPage = ref<number>(0);
+const getShareBoardsMaxPage = ref<number>(0);
+const boards = ref<ResponseBoard[]>([]);
+const useAccessToken = useAccessTokenStore();
 const route = useRoute();
-const useValidateAccessToken = useValidateAccessTokenStore();
+const memberId = route.params.id as string;
 const pageNumber = route.params.page as string;
-const totalPages = route.params.totalPages as string;
-const maxPageNumber = parseInt(totalPages);
-const datas = reactive({
-  totalPages: maxPageNumber,
+const pageNavigateMyPageData = reactive({
+  totalBoards: 0,
+  memberId: memberId,
   curPage: parseInt(route.params.page as string),
 });
 
-const boards = ref<ResponseBoard[]>([]);
+onMounted(async () => {
+  const loginMyId = JwtDecode(useAccessToken.accessToken).id;
+  const getAllBoards = await allBoardGetSizeByPageAndLoginMemberId<ResponseBoard[]>(pageNumber, loginMyId);
+  if (getAllBoards) {
+    for (const board of getAllBoards) {
+      boards.value.push(board);
+    }
+    pageNavigateMyPageData.totalBoards = getAllBoards.length;
+  }
+  const getBoards = await boardGetAllById<ResponseBoard[]>(`/getBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
+  if (getBoards) {
+    pageNavigateMyPageData.totalBoards += getBoards.length
+  }
+  const getShareBoards = await boardGetAllById<ResponseBoard[]>(`/getShareBoards/${JwtDecode(useAccessToken.accessToken).id.toString()}`);
+  if (getShareBoards) {
+    pageNavigateMyPageData.totalBoards += getShareBoards.length
+  }
+});
 
 //자식 컴포넌트에서 remove하여 데이터를 삭제하고 boardId값을 받아옴
 //해당 boardId값으로 필터를 통해 boards를 초기화 시키고 다시줌
 function handleRemoveBoard(boardId: number) {
   boards.value = boards.value.filter((board) => board.boardId !== boardId);
-  datas.totalPages--;
+  pageNavigateMyPageData.totalBoards--;
+}
+
+function handleShareRemoveBoard(shareBoard: ResponseShareBoard) {
+  boards.value = boards.value.filter((board) => board.sharedId !== shareBoard.sharedId);
+  pageNavigateMyPageData.totalBoards--;
 }
 
 //comment가 수정되었을떄
@@ -60,19 +85,6 @@ function handleCommentSend(commentsDatas: CommentsDatas) {
   const boardIdx = boards.value.findIndex((board) => board.boardId === getBoardId);
   boards.value[boardIdx].comments.push(commentsDatas);
 }
-
-onMounted(async () => {
-  useValidateAccessToken.validateAccessToken = await isVerifyAccessTokenFetch();
-  const getBoards = await boardGetSizeByPage<ResponseBoard[]>(pageNumber);
-  if (getBoards) {
-    boards.value = [...getBoards];
-  }
-});
-
-const datasComputed = computed(() => ({
-  ...datas,
-  totalPages: datas.totalPages,
-}));
 </script>
 
 <style scoped></style>

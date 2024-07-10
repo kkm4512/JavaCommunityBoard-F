@@ -1,5 +1,5 @@
 <template>
-  <nav aria-label="Page navigation example" v-if="useAccessToken.accessToken">
+  <nav aria-label="Page navigation example" v-if="props.datas.totalPages >= 1">
     <ul class="inline-flex -space-x-px text-base h-10">
       <li v-if="curPage !== 1">
         <NuxtLink

@@ -7,7 +7,9 @@
 export default defineNuxtRouteMiddleware(async(to, from) => {
   const isValidateAccessToken = await isVerifyAccessTokenFetch();
   if (!isValidateAccessToken) {
-    alert("접근 권한이 없습니다")
-    return navigateTo("/")
+    if (typeof window !== "undefined") {
+      alert("로그인후 이용해 주세요")
+      return navigateTo("/login")
+    }
   }
 })

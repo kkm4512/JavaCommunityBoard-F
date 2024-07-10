@@ -48,11 +48,12 @@
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiFileDocumentPlusOutline } from "@mdi/js";
 const accessToken = await getCookie();
-const memberId = JwtDecode(accessToken).id;
-const nickname = JwtDecode(accessToken).nickname;
 const router = useRouter();
 const path = ref(mdiFileDocumentPlusOutline);
 const useBoardImage = useBoardImageStore();
+const useAccessToken = useAccessTokenStore();
+const loginMyId = ref<number | null>(useAccessToken.accessToken ? JwtDecode(useAccessToken.accessToken).id : null);
+const loginMyNickname = ref<string | null>(useAccessToken.accessToken ? JwtDecode(useAccessToken.accessToken).nickname : null);
 
 
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -61,10 +62,10 @@ const { file, handleFileUpload } = useFileUpload();
 
 
 const board = reactive({
-  memberId: memberId,
+  memberId: loginMyId.value,
   title: "",
   description: "",
-  nickname: nickname,
+  nickname: loginMyNickname.value,
 });
 
 async function createBoard() {

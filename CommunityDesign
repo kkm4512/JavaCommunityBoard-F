@@ -89,5 +89,6 @@
 11. 다음 db에 회원가입시 이미지 안넣었으면 default 이미지넣어두고, default 경로 만들어두기 [ JavaSpring ]
 12. onMounted 쓰지말고 asyncData 쓰기 [ Nuxt3 ]
 13. 양방향 연관 관계 설정 [ JavaSpring ]
+14. fetch 이름 지을때 method를 맨앞에 쓰기 GET,POST 등등 [ Nuxt3 ]
 
 

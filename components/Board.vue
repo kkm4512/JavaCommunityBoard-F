@@ -39,7 +39,7 @@
       <svg-icon type="mdi" :path="isShare" @click.stop="shareClicked"></svg-icon>
     </div>
     <div v-if="isComment === mdiIcons.comment" class="text-black mt-5">
-      <Comment :commentDatasSendCommentModal="commentDatas" @comment-board-send.stop="handleComment" @comment-board-update.stop="handleCommentUpdate" @comment-board-remove.stop="handleCommentRemove" />
+      <Comment :commentDatasSendCommentModal="commentDatas" @comment-board-send="handleComment" @comment-board-update="handleCommentUpdate" @comment-board-remove="handleCommentRemove" />
     </div>
 
     <div class="flex justify-between mt-5 text-sm">
@@ -153,6 +153,7 @@ async function isLoginCheck() {
   const isLogin = (await isVerifyAccessTokenFetch()) ? true : false;
   if (!isLogin) {
     alert("로그인 되어있지 않습니다");
+    navigateTo("/login")
     return false;
   }
   return true;
@@ -335,12 +336,14 @@ async function likeClicked() {
   if (loginMyId.value) {
     likeFetch(loginMyId.value, props.board.boardId);
     isLike.value = isLike.value === mdiIcons.notLike ? mdiIcons.like : mdiIcons.notLike;
-  } else alert("로그인 되어있지 않습니다");
+  } else {
+    alert("로그인 되어있지 않습니다");
+    return navigateTo("/login")
+  }
 }
 
 //댓글버튼 눌렀을때
 async function commnetClicked() {
-  if (!(await isLoginCheck())) return;
   isComment.value = isComment.value === mdiIcons.notCommnet ? mdiIcons.comment : mdiIcons.notCommnet;
 }
 

@@ -17,7 +17,7 @@
         {{ commentData.comment }}
       </div>
       <div class="flex">
-        <div v-if="commentData.memberId === JwtDecode(useAccessToken.accessToken).id">
+        <div v-if="commentData.memberId === isAccessTokenDecoded?.id">
           <svg-icon
             @click="handleUpdate(commentData.id, commentData.comment, commentData.memberId, commentData.boardId)"
             type="mdi"
@@ -25,7 +25,7 @@
             class="text-black cursor-pointer w-5"
           ></svg-icon>
         </div>
-        <div v-if="commentData.memberId === JwtDecode(useAccessToken.accessToken).id || commentDatasSendCommentModal.createMemberBoardId === JwtDecode(useAccessToken.accessToken).id">
+        <div v-if="commentData.memberId === isAccessTokenDecoded?.id || commentDatasSendCommentModal.createMemberBoardId === isAccessTokenDecoded?.id">
           <svg-icon @click="handleRemove(commentData.id, commentData.memberId, commentData.boardId)" type="mdi" :path="mdiIcons.close" class="text-black cursor-pointer w-5"></svg-icon>
         </div>
       </div>
@@ -44,13 +44,18 @@ import { DEFAULT_PROFILE_PATH } from "~/paths/pathConstatns";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCloseBoxMultiple, mdiUpdate } from "@mdi/js";
 import type { CommentDatasSendCommentModal, CommentRemoveModal, CommentUpdateModal, CommentsDatas } from "~/types/commentUpdateModal";
+import type { JwtMemberInfo } from "~/types/jwtMemberInfo";
 
 //댓글 작성눌렀을때 반응형으로 만들어두려고 임시로 만듬
 const memberProfilePath = useMemberProfileImageStore();
 const useAccessToken = useAccessTokenStore();
+const isAccessTokenDecoded = ref<JwtMemberInfo | null>(useAccessToken.accessToken ? JwtDecode(useAccessToken.accessToken) : null);
+watchEffect(() => {
+  isAccessTokenDecoded.value = useAccessToken.accessToken ? JwtDecode(useAccessToken.accessToken) : null;
+});
 
 //댓글 작성눌렀을떄 반응형으로 만들어두려고 임시로 만듬
-const memberNickname = JwtDecode(useAccessToken.accessToken).nickname;
+const memberNickname = isAccessTokenDecoded.value?.nickname;
 
 //midIcon path
 const mdiIcons = {
@@ -102,9 +107,8 @@ if (commentFormatCreatedDates.length >= 5) {
 } else {
   for (let i = 0; i < commentFormatCreatedDates.length; i++) {
     commentFormatCreatedDataList.push(commentFormatCreatedDates[i]);
-  }  
+  }
 }
-
 
 // for ( const comment of props.commentDatasSendCommentModal.commentDatas) {
 
@@ -137,15 +141,6 @@ const { data: initData } = useAsyncData("initData", async () => {
   };
 });
 const emit = defineEmits(["comment-board-send", "comment-board-update", "comment-board-remove"]);
-
-//댓글 버튼 눌렸을때
-//내가 이걸 눌를때마다 boardId,,memberId,description만 전해주면됨
-function commentSendClicked() {
-  emit("comment-board-send", description.value);
-  description.value = "";
-  profilePaths.value.push(memberProfilePath.memberProfileImageURL);
-  nicknames.value.push(memberNickname);
-}
 
 function handleUpdate(id: number, comment: string, memberId: number, boardId: number) {
   updateClicked.value = !updateClicked.value;

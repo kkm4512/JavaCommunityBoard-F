@@ -87,6 +87,7 @@ import type { ResponseUpdateModal, UpdateModal } from "~/types/updateModal";
 import { DEFAULT_PROFILE_PATH } from "~/paths/pathConstatns";
 import { useAccessTokenStore } from "~/stores/accessToken";
 import type { CommentDatasSendCommentModal, CommentRemoveModal, CommentUpdateModal } from "~/types/commentUpdateModal";
+import type { JwtMemberInfo } from "~/types/jwtMemberInfo";
 
 //midIcon path
 const mdiIcons = {
@@ -99,6 +100,7 @@ const mdiIcons = {
   notCommnet: mdiCommentOutline,
   notShare: mdiShareOutline,
 };
+
 
 //현재 로그인 되어있는 사용자의 id와, 각 게시글에 저장되있는 memberId가 같은경우에만 update,remove버튼 보여주게하기
 const showUpdateRemoveButton = ref<boolean>(false);
@@ -338,7 +340,6 @@ async function likeClicked() {
 
 //댓글버튼 눌렀을때
 async function commnetClicked() {
-  if (!(await isLoginCheck())) return;
   isComment.value = isComment.value === mdiIcons.notCommnet ? mdiIcons.comment : mdiIcons.notCommnet;
 }
 

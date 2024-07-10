@@ -113,13 +113,28 @@ const userInfo = reactive({
 });
 
 async function signUp() {
+  const formData = new FormData();
   if (selectedIcon.value === "ROLE_ADMIN") {
     if (adminPasswordCheck.value !== adminPasswordKey) {
       alert("관리자 패스워드가 일치하지 않습니다");
       return;
+    } else {
+      formData.append(
+        "userInfo",
+        new Blob(
+          [
+            JSON.stringify({
+              name: userInfo.name,
+              password: userInfo.password,
+              nickname: userInfo.nickname,
+              role: userInfo.role,
+            }),
+          ],
+          { type: "application/json" }
+        )
+      );
     }
   } else {
-    const formData = new FormData();
     formData.append(
       "userInfo",
       new Blob(
@@ -134,14 +149,14 @@ async function signUp() {
         { type: "application/json" }
       )
     );
-    if (file.value) {
-      formData.append("profileImg", file.value);
-    }
-    const res = await memberFetch("signUp", "POST", formData);
-    if (res) {
-      alert("회원가입 성공");
-      navigateTo("/");
-    }
+  }
+  if (file.value) {
+    formData.append("profileImg", file.value);
+  }
+  const res = await memberFetch("signUp", "POST", formData);
+  if (res) {
+    alert("회원가입 성공");
+    navigateTo("/");
   }
 }
 

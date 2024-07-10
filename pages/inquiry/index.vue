@@ -9,7 +9,6 @@ import type { Inquiry } from '~/types/inquiry';
 
 
 async function handleInquriy(inquiry:Inquiry){
-  console.log(inquiry)
   const formData = new FormData();
   formData.append(
     "inquirySaveDTO",
@@ -19,14 +18,20 @@ async function handleInquriy(inquiry:Inquiry){
         description: inquiry.description,
         category: inquiry.category,
         memberId: inquiry.memberId,
+        status: "IN_PROCESS",
       })
     ], { type: "application/json" } )
   )
   if (inquiry.file) formData.append("saveInquiryImage",inquiry.file);
-  await inquiryFetch(formData);
+  const saveNunber = await inquiryFetch<number>(formData);
+  if (saveNunber) await inquiryCompleteFetch<boolean>(saveNunber);
   alert("문의가 정상적으로 등록 되었습니다")
   navigateTo("/")
 }
+
+definePageMeta({
+  middleware: ["auth"],
+});
 
 </script>
 

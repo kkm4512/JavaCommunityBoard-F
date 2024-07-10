@@ -55,7 +55,8 @@
 <script setup lang="ts">
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiFileDocumentPlusOutline } from "@mdi/js";
-const useAcessToken = useAccessTokenStore();
+const useAccessToken = useAccessTokenStore();
+const loginMyId = ref<number | null>(useAccessToken.accessToken ? JwtDecode(useAccessToken.accessToken).id : null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const { file, handleFileUpload } = useFileUpload();
 const { imageUrl } = usePreviewImage(file);
@@ -71,7 +72,7 @@ const userInfo = reactive({
 const emit = defineEmits(["inquiry-component"]);
 
 function send() {
-  userInfo.memberId = JwtDecode(useAcessToken.accessToken).id;
+  userInfo.memberId = loginMyId.value ? loginMyId.value : 0;
   userInfo.file = file.value;
   if (userInfo.category === "") {
     alert("선택항목을 골라주세요");
